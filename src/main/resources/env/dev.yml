@@ -1,0 +1,12 @@
+resources:
+  requests:
+    cpu: "1"
+    memory: 2048Mi
+  limits:
+    cpu: "2"
+    memory: 2048Mi
+annotations:
+  "downscaler/uptime": "Mon-Fri 08:00-19:00 Europe/London"
+envVariables:
+  applicationName: "ticketer-agent-service"
+  SPRING_PROFILE_ACTIVE: "dev"

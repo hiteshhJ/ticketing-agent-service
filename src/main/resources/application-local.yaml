@@ -1,0 +1,25 @@
+# Server Configuration
+server:
+  port: 8082
+
+# MongoDB Configuration
+spring:
+  data:
+    mongodb:
+      promotion-uri: ${MONGODB_PROMOTION_URI}
+      price-history-uri: ${MONGODB_PRICE_HISTORY_URI}
+
+# Security Configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://sts.windows.net/${AZURE_TENANT_ID}/
+          audiences: api://${AZURE_CLIENT_ID}
+
+# Azure OpenAI Configuration
+azure:
+  openai:
+    endpoint: ${AZURE_OPENAI_ENDPOINT}
+    api-key: ${AZURE_OPENAI_API_KEY}
+    deployment-name: ${AZURE_OPENAI_DEPLOYMENT_NAME}

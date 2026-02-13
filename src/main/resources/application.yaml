@@ -1,0 +1,40 @@
+# Application Configuration
+spring:
+  profiles:
+    active: ${SPRING_PROFILE_ACTIVE:local}
+  application:
+    name: ticketing-agent-service
+
+  # MongoDB Configuration
+  data:
+    mongodb:
+      promotion-uri: ${MONGODB_PROMOTION_URI}
+      price-history-uri: ${MONGODB_PRICE_HISTORY_URI}
+
+  # Jackson Configuration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+  # Security Configuration
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://sts.windows.net/${AZURE_TENANT_ID}/
+          audiences: api://${AZURE_CLIENT_ID}
+
+# Azure OpenAI Configuration
+azure:
+  openai:
+    endpoint: ${AZURE_OPENAI_ENDPOINT}
+    api-key: ${AZURE_OPENAI_API_KEY}
+    deployment-name: ${AZURE_OPENAI_DEPLOYMENT_NAME}
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.sainsburys.agent: INFO
+

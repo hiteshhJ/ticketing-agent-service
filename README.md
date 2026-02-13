@@ -6,7 +6,6 @@ AI-powered chatbot service for querying promotions and pricing data using Azure 
 
 - 🤖 Azure OpenAI GPT-4o integration with function calling
 - 🔍 Query promotions and price history from MongoDB
-- 🔒 JWT-based authentication from Next.js app
 - ☕ Built with Spring Boot 3.2 & Java 21
 
 ## Technology Stack
