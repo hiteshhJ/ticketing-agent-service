@@ -46,11 +46,9 @@ export AZURE_OPENAI_API_KEY=your-api-key
 export AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o-deployment
 
 # MongoDB
-export MONGODB_PROMOTION_URI=mongodb+srv://user:pass@cluster.mongodb.net/promotionDB
-export MONGODB_PRICE_HISTORY_URI=mongodb+srv://user:pass@cluster.mongodb.net/priceHistoryDB
+export MONGODB_PROMOTION_URI=MONGODB_PROMOTION_URI
+export MONGODB_PRICE_HISTORY_URI=MONGODB_PRICE_HISTORY_URI
 
-# JWT Secret (must match Next.js NEXTAUTH_SECRET)
-export NEXTAUTH_SECRET=your-nextauth-secret
 ```
 
 ### 3. Run Development Server
@@ -129,7 +127,7 @@ src/main/java/com/sainsburys/agent/
 │   ├── EcsPromotion.java              # Promotion entity
 │   └── EcsPrice.java                  # Price entity
 ├── security/
-│   ├── JwtAuthFilter.java             # JWT validation filter
+│   ├── JwtConfig.java                 # JWT validation filter
 │   └── SecurityConfig.java            # Spring Security config
 └── config/
     ├── AzureOpenAIConfig.java         # Azure OpenAI client
@@ -205,12 +203,6 @@ services:
 2. Check environment variables are set
 3. Verify Azure OpenAI credentials
 4. Test MongoDB connectivity
-
-### JWT authentication fails
-
-1. Ensure `NEXTAUTH_SECRET` matches Next.js app
-2. Check JWT token format (should be `Bearer <token>`)
-3. Verify token hasn't expired
 
 ### No database results
 
