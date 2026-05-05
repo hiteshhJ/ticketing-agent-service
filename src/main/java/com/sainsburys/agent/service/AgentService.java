@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.sainsburys.agent.common.AppConstant.MESSAGE_ROLE_ASSISTANT;
+import static com.sainsburys.agent.common.AppConstant.MESSAGE_ROLE_USER;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -30,7 +33,7 @@ public class AgentService {
     private String deploymentName;
 
     private static final String SYSTEM_PROMPT = """
-            You are a helpful AI assistant for the Ticketing & Pricing system at Sainsbury's.
+            You are a helpful AI assistant for the Ticketing system at Sainsbury's.
             
             You help users query:
             - **Promotions** (meal deals, discounts, special offers) from the ecsPromotions collection
@@ -42,7 +45,7 @@ public class AgentService {
             - If asked about a product, show both promotions AND current price when relevant
             - For date ranges, use ISO format (YYYY-MM-DD)
             - Offer types: 411 = Mix & Match deals, 500 = Regular pricing
-            - Price levels typically indicate store tier (e.g., 30)
+            - Price levels typically indicate store tier (e.g., 30) or Zone (e.g., 40)
             - Always use the provided tools to query real data - never make up information
             - If no results are found, suggest alternative queries
             
@@ -70,8 +73,10 @@ public class AgentService {
             ChatChoice choice = chatCompletions.getChoices().getFirst();
             ChatResponseMessage assistantMessage = choice.getMessage();
 
-//            // Add assistant message
-//            messages.add(assistantMessage);
+//           Add assistant message
+            ChatRequestAssistantMessage chatRequestAssistantMessage = new ChatRequestAssistantMessage(assistantMessage.getContent());
+            chatRequestAssistantMessage.setToolCalls(assistantMessage.getToolCalls());
+            messages.add(chatRequestAssistantMessage);
 
             // Check for tool calls
             List<ChatCompletionsToolCall> toolCalls = assistantMessage.getToolCalls();
@@ -111,15 +116,15 @@ public class AgentService {
                 .build();
     }
 
-    private List<ChatRequestMessage> buildMessages(String userMessage, List<Message> history) {
+    private static List<ChatRequestMessage> buildMessages(String userMessage, List<Message> history) {
         List<ChatRequestMessage> messages = new ArrayList<>();
         messages.add(new ChatRequestSystemMessage(SYSTEM_PROMPT));
 
         // Add conversation history
         for (Message msg : history) {
-            if ("user".equals(msg.getRole())) {
+            if (MESSAGE_ROLE_USER.equals(msg.getRole())) {
                 messages.add(new ChatRequestUserMessage(msg.getContent()));
-            } else if ("assistant".equals(msg.getRole())) {
+            } else if (MESSAGE_ROLE_ASSISTANT.equals(msg.getRole())) {
                 messages.add(new ChatRequestAssistantMessage(msg.getContent()));
             }
         }
