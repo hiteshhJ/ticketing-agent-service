@@ -36,25 +36,12 @@ public class PriceTools {
         try {
             Query query = new Query();
 
-            if (params.containsKey(PARAM_PRODUCT_CODE)) {
-                query.addCriteria(Criteria.where(PARAM_PRODUCT_CODE).is(params.get(PARAM_PRODUCT_CODE)));
-            }
+            PromotionTools.addQueryCriteria(params, query);
 
-            if (params.containsKey(PARAM_PRICE_LEVEL)) {
-                query.addCriteria(Criteria.where(PARAM_PRICE_LEVEL).is(params.get(PARAM_PRICE_LEVEL)));
-            }
+            int limit = params.containsKey(PARAM_LIMIT) ?
+                    ((Number) params.get(PARAM_LIMIT)).intValue() : DEFAULT_LIMIT;
+            query.limit(Math.min(limit, MAXIMUM_LIMIT));
 
-            if (params.containsKey(PARAM_PRICE_CODE)) {
-                query.addCriteria(Criteria.where(PARAM_PRICE_CODE).is(params.get(PARAM_PRICE_CODE)));
-            }
-
-            if (params.containsKey(PARAM_OFFER_TYPE)) {
-                query.addCriteria(Criteria.where(PARAM_OFFER_TYPE).is(params.get(PARAM_OFFER_TYPE)));
-            }
-
-            int limit = params.containsKey("limit") ?
-                    ((Number) params.get("limit")).intValue() : 10;
-            query.limit(Math.min(limit, 100));
             query.with(Sort.by(Sort.Direction.DESC, PROP_PRICE_START_DATE));
 
             List<EcsPrice> results = priceHistoryMongoTemplate.find(query, EcsPrice.class);

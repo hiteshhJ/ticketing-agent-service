@@ -36,27 +36,19 @@ public class PromotionTools {
         try {
             Query query = new Query();
 
+
+            addQueryCriteria(params, query);
+            if (params.containsKey(PARAM_PROMOTION_NAME)) {
+                query.addCriteria(Criteria.where("priceDetails.offerDetailValue")
+                        .regex((String) params.get(PARAM_PROMOTION_NAME), "i"));
+            }
             if (params.containsKey(PARAM_PRODUCT_CODE)) {
                 query.addCriteria(Criteria.where("priceDetails.offerDetailList.productCode")
                         .is(params.get(PARAM_PRODUCT_CODE)));
             }
-
-            if (params.containsKey(PARAM_OFFER_TYPE)) {
-                query.addCriteria(Criteria.where(PARAM_OFFER_TYPE).is(params.get(PARAM_OFFER_TYPE)));
-            }
-
-            if (params.containsKey(PARAM_PRICE_LEVEL)) {
-                query.addCriteria(Criteria.where(PARAM_PRICE_LEVEL).is(params.get(PARAM_PRICE_LEVEL)));
-            }
-
-            if (params.containsKey(PARAM_PROMOTION_NAME)) {
-                query.addCriteria(Criteria.where(PARAM_PROMOTION_NAME)
-                        .regex((String) params.get(PARAM_PROMOTION_NAME), "i"));
-            }
-
-            int limit = params.containsKey("limit") ?
-                    ((Number) params.get("limit")).intValue() : 10;
-            query.limit(Math.min(limit, 100));
+            int limit = params.containsKey(PARAM_LIMIT) ?
+                    ((Number) params.get(PARAM_LIMIT)).intValue() : DEFAULT_LIMIT;
+            query.limit(Math.min(limit, MAXIMUM_LIMIT));
 
             List<EcsPromotion> results = promotionMongoTemplate.find(query, EcsPromotion.class);
 
@@ -74,9 +66,36 @@ public class PromotionTools {
         }
     }
 
+    static void addQueryCriteria(Map<String, Object> params, Query query) {
+        if (params.containsKey(PARAM_PRICE_LEVEL)) {
+            query.addCriteria(Criteria.where(PARAM_PRICE_LEVEL).is(params.get(PARAM_PRICE_LEVEL)));
+        }
+        if (params.containsKey(PARAM_PRICE_CODES)) {
+            query.addCriteria(Criteria.where(PARAM_PRICE_CODES).in(params.get(PARAM_PRICE_CODES)));
+        }
+        if (params.containsKey(PARAM_PRICE_CODE)) {
+            query.addCriteria(Criteria.where(PARAM_PRICE_CODE).in(params.get(PARAM_PRICE_CODE)));
+        }
+        if (params.containsKey(PARAM_PRICE_START_DATE)) {
+            query.addCriteria(Criteria.where(PARAM_PRICE_START_DATE).is(params.get(PARAM_PRICE_START_DATE)));
+        }
+        if (params.containsKey(PARAM_PRICE_END_DATE)) {
+            query.addCriteria(Criteria.where(PARAM_PRICE_END_DATE).is(params.get(PARAM_PRICE_END_DATE)));
+        }
+        if (params.containsKey(PARAM_OFFER_TYPE)) {
+            query.addCriteria(Criteria.where(PARAM_OFFER_TYPE).is(params.get(PARAM_OFFER_TYPE)));
+        }
+        if (params.containsKey(PARAM_IS_ADVERTISING_REQUIRED)) {
+            query.addCriteria(Criteria.where(PARAM_IS_ADVERTISING_REQUIRED).is(params.get(PARAM_IS_ADVERTISING_REQUIRED)));
+        }
+        if (params.containsKey(PARAM_IS_PUBLISHED)) {
+            query.addCriteria(Criteria.where(PARAM_IS_PUBLISHED).is(params.get(PARAM_IS_PUBLISHED)));
+        }
+    }
+
     public Map<String, Object> getPromotionById(Map<String, Object> params) {
         try {
-            String id = (String) params.get("id");
+            String id = (String) params.get(PARAM_ID);
             if (id == null) {
                 return Map.of(ERROR_MESSAGE, "ID is required");
             }
@@ -96,19 +115,7 @@ public class PromotionTools {
     public Map<String, Object> countPromotions(Map<String, Object> params) {
         try {
             Query query = new Query();
-
-            if (params.containsKey(PARAM_PRODUCT_CODE)) {
-                query.addCriteria(Criteria.where("priceDetails.offerDetailList.productCode")
-                        .is(params.get(PARAM_PRODUCT_CODE)));
-            }
-
-            if (params.containsKey(PARAM_OFFER_TYPE)) {
-                query.addCriteria(Criteria.where(PARAM_OFFER_TYPE).is(params.get(PARAM_OFFER_TYPE)));
-            }
-
-            if (params.containsKey(PARAM_PUBLISHED)) {
-                query.addCriteria(Criteria.where(PARAM_PUBLISHED).is(params.get(PARAM_PUBLISHED)));
-            }
+            addQueryCriteria(params, query);
 
             long count = promotionMongoTemplate.count(query, EcsPromotion.class);
 

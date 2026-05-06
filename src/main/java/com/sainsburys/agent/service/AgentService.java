@@ -17,8 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.sainsburys.agent.common.AppConstant.MESSAGE_ROLE_ASSISTANT;
-import static com.sainsburys.agent.common.AppConstant.MESSAGE_ROLE_USER;
+import static com.sainsburys.agent.common.AppConstant.*;
 
 @Slf4j
 @Service
@@ -51,6 +50,8 @@ public class AgentService {
             - Always use the provided tools to query real data - never make up information
             - If no results are found, suggest alternative queries
             - When explaining promotions, include offer type descriptions from the offerTypeDetail collection for clarity
+            - When the user asks about promotion types (e.g., show me active meal deal promtoions), here "meal deal" can be promo type description or promo mechanic description or reward mechnic type.
+             These details are found in offer type table. Find the offer type first then search for promotions with that offer type
             
             ## Current date: %s
             
@@ -143,13 +144,11 @@ public class AgentService {
 
         for (Map<String, Object> toolDef : ToolDefinitions.getAllToolDefinitions()) {
             @SuppressWarnings("unchecked")
-            Map<String, Object> function = (Map<String, Object>) toolDef.get("function");
-            String name = (String) function.get("name");
-            String description = (String) function.get("description");
+            Map<String, Object> function = (Map<String, Object>) toolDef.get(TOOL_DEF_FUNCTION);
 
-            FunctionDefinition functionDefinition = new FunctionDefinition(name);
-            functionDefinition.setDescription(description);
-            functionDefinition.setParameters(BinaryData.fromObject(function.get("parameters")));
+            FunctionDefinition functionDefinition = new FunctionDefinition(function.get(TOOL_DEF_NAME).toString());
+            functionDefinition.setDescription(function.get(TOOL_DEF_DESCRIPTION).toString());
+            functionDefinition.setParameters(BinaryData.fromObject(function.get(TOOL_DEF_PARAMETERS)));
 
             tools.add(new ChatCompletionsFunctionToolDefinition(functionDefinition));
         }

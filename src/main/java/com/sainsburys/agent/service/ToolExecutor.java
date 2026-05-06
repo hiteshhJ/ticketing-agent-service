@@ -43,7 +43,7 @@ public class ToolExecutor {
                 case GET_OFFER_TYPE_DETAIL -> offerTypeTools.getOfferTypeDetail(params);
                 case QUERY_OFFER_TYPES -> offerTypeTools.queryOfferTypes(params);
                 case GET_ALL_OFFER_TYPES -> offerTypeTools.getAllOfferTypes();
-                default -> Map.of("error", "Unknown tool: " + functionName);
+                default -> Map.of(ERROR_MESSAGE, "Unknown tool: " + functionName);
             };
 
             log.info("✅ Tool result: {}", result);
@@ -51,7 +51,7 @@ public class ToolExecutor {
 
         } catch (Exception e) {
             log.error("❌ Tool execution error for {}: {}", functionName, e.getMessage(), e);
-            return Map.of("error", "Tool execution failed: " + e.getMessage());
+            return Map.of(ERROR_MESSAGE, "Tool execution failed: " + e.getMessage());
         }
     }
 }

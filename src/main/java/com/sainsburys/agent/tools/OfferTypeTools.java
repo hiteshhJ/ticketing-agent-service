@@ -1,6 +1,5 @@
 package com.sainsburys.agent.tools;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sainsburys.agent.model.OfferTypeDetail;
 import com.sainsburys.agent.repository.OfferTypeRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.sainsburys.agent.common.AppConstant.*;
 
@@ -23,14 +21,11 @@ public class OfferTypeTools {
 
     private final OfferTypeRepository offerTypeRepository;
     private final MongoTemplate promotionMongoTemplate;
-    private final ObjectMapper objectMapper;
 
     public OfferTypeTools(OfferTypeRepository offerTypeRepository,
-                          @Qualifier("promotionMongoTemplate") MongoTemplate promotionMongoTemplate,
-                          ObjectMapper objectMapper) {
+                          @Qualifier("promotionMongoTemplate") MongoTemplate promotionMongoTemplate) {
         this.offerTypeRepository = offerTypeRepository;
         this.promotionMongoTemplate = promotionMongoTemplate;
-        this.objectMapper = objectMapper;
     }
 
     /**
@@ -38,17 +33,24 @@ public class OfferTypeTools {
      */
     public Map<String, Object> getOfferTypeDetail(Map<String, Object> params) {
         try {
-            String offerType = (String) params.get("offerType");
+            String offerType = (String) params.get(PARAM_OFFER_TYPE);
             if (offerType == null) {
                 return Map.of(ERROR_MESSAGE, "offerType is required");
             }
 
-            Optional<OfferTypeDetail> offerTypeDetail = offerTypeRepository.findByOfferType(offerType);
+            List<OfferTypeDetail> offerTypeDetail = offerTypeRepository.findByOfferType(offerType);
             if (offerTypeDetail.isEmpty()) {
                 return Map.of(ERROR_MESSAGE, "Offer type " + offerType + " not found");
             }
 
-            return objectMapper.convertValue(offerTypeDetail.get(), Map.class);
+            List<Map<String, Object>> simplified = offerTypeDetail.stream()
+                    .map(this::simplifyOfferType)
+                    .toList();
+
+            return Map.of(
+                    KEY_COUNT, offerTypeDetail.size(),
+                    KEY_OFFER_TYPES, simplified
+            );
         } catch (Exception e) {
             log.error("Error getting offer type detail", e);
             return Map.of(ERROR_MESSAGE, "Failed to get offer type detail: " + e.getMessage());
@@ -62,19 +64,29 @@ public class OfferTypeTools {
         try {
             Query query = new Query();
 
-            if (params.containsKey(PROMO_TYPE_DESC)) {
-                query.addCriteria(Criteria.where(PROMO_TYPE_DESC)
-                        .regex((String) params.get(PROMO_TYPE_DESC), "i"));
+            if (params.containsKey(PARAM_PROMO_TYPE_DESC)) {
+                query.addCriteria(Criteria.where(PARAM_PROMO_TYPE_DESC)
+                        .regex((String) params.get(PARAM_PROMO_TYPE_DESC), "i"));
             }
 
-            if (params.containsKey(REWARD_MECHANIC_TYPE)) {
-                query.addCriteria(Criteria.where(REWARD_MECHANIC_TYPE)
-                        .is(params.get(REWARD_MECHANIC_TYPE)));
+            if (params.containsKey(PARAM_PROMO_MECHANIC_DESC)) {
+                query.addCriteria(Criteria.where(PARAM_PROMO_MECHANIC_DESC)
+                        .regex((String) params.get(PARAM_PROMO_MECHANIC_DESC), "i"));
             }
 
-            int limit = params.containsKey("limit") ?
-                    ((Number) params.get("limit")).intValue() : 50;
-            query.limit(Math.min(limit, 100));
+            if (params.containsKey(PARAM_REWARD_MECHANIC_TYPE)) {
+                query.addCriteria(Criteria.where(PARAM_REWARD_MECHANIC_TYPE)
+                        .is(params.get(PARAM_REWARD_MECHANIC_TYPE)));
+            }
+
+            if (params.containsKey(PARAM_THRESHOLD)) {
+                query.addCriteria(Criteria.where(PARAM_THRESHOLD)
+                        .is(params.get(PARAM_THRESHOLD)));
+            }
+
+            int limit = params.containsKey(PARAM_LIMIT) ?
+                    ((Number) params.get(PARAM_LIMIT)).intValue() : DEFAULT_LIMIT;
+            query.limit(Math.min(limit, MAXIMUM_LIMIT));
 
             List<OfferTypeDetail> results = promotionMongoTemplate.find(query, OfferTypeDetail.class, "offerTypeDetail");
 
@@ -83,8 +95,8 @@ public class OfferTypeTools {
                     .toList();
 
             return Map.of(
-                    "count", results.size(),
-                    "offerTypes", simplified
+                    KEY_COUNT, results.size(),
+                    KEY_OFFER_TYPES, simplified
             );
         } catch (Exception e) {
             log.error("Error querying offer types", e);
@@ -104,8 +116,8 @@ public class OfferTypeTools {
                     .toList();
 
             return Map.of(
-                    "count", allOfferTypes.size(),
-                    "offerTypes", simplified
+                    KEY_COUNT, allOfferTypes.size(),
+                    KEY_OFFER_TYPES, simplified
             );
         } catch (Exception e) {
             log.error("Error getting all offer types", e);
