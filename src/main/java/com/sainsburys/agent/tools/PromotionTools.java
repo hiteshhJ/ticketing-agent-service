@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.sainsburys.agent.common.AppConstant.*;
+
 @Slf4j
 @Component
 public class PromotionTools {
@@ -34,22 +36,22 @@ public class PromotionTools {
         try {
             Query query = new Query();
 
-            if (params.containsKey("productCode")) {
+            if (params.containsKey(PARAM_PRODUCT_CODE)) {
                 query.addCriteria(Criteria.where("priceDetails.offerDetailList.productCode")
-                        .is(params.get("productCode")));
+                        .is(params.get(PARAM_PRODUCT_CODE)));
             }
 
-            if (params.containsKey("offerType")) {
-                query.addCriteria(Criteria.where("offerType").is(params.get("offerType")));
+            if (params.containsKey(PARAM_OFFER_TYPE)) {
+                query.addCriteria(Criteria.where(PARAM_OFFER_TYPE).is(params.get(PARAM_OFFER_TYPE)));
             }
 
-            if (params.containsKey("priceLevel")) {
-                query.addCriteria(Criteria.where("priceLevel").is(params.get("priceLevel")));
+            if (params.containsKey(PARAM_PRICE_LEVEL)) {
+                query.addCriteria(Criteria.where(PARAM_PRICE_LEVEL).is(params.get(PARAM_PRICE_LEVEL)));
             }
 
-            if (params.containsKey("promotionName")) {
-                query.addCriteria(Criteria.where("promotionName")
-                        .regex((String) params.get("promotionName"), "i"));
+            if (params.containsKey(PARAM_PROMOTION_NAME)) {
+                query.addCriteria(Criteria.where(PARAM_PROMOTION_NAME)
+                        .regex((String) params.get(PARAM_PROMOTION_NAME), "i"));
             }
 
             int limit = params.containsKey("limit") ?
@@ -68,7 +70,7 @@ public class PromotionTools {
             );
         } catch (Exception e) {
             log.error("Error querying promotions", e);
-            return Map.of("error", "Failed to query promotions: " + e.getMessage());
+            return Map.of(ERROR_MESSAGE, "Failed to query promotions: " + e.getMessage());
         }
     }
 
@@ -76,18 +78,18 @@ public class PromotionTools {
         try {
             String id = (String) params.get("id");
             if (id == null) {
-                return Map.of("error", "ID is required");
+                return Map.of(ERROR_MESSAGE, "ID is required");
             }
 
             Optional<EcsPromotion> promotion = promotionRepository.findById(id);
             if (promotion.isEmpty()) {
-                return Map.of("error", "Promotion not found");
+                return Map.of(ERROR_MESSAGE, "Promotion not found");
             }
 
             return objectMapper.convertValue(promotion.get(), Map.class);
         } catch (Exception e) {
             log.error("Error getting promotion by ID", e);
-            return Map.of("error", "Failed to get promotion: " + e.getMessage());
+            return Map.of(ERROR_MESSAGE, "Failed to get promotion: " + e.getMessage());
         }
     }
 
@@ -95,17 +97,17 @@ public class PromotionTools {
         try {
             Query query = new Query();
 
-            if (params.containsKey("productCode")) {
+            if (params.containsKey(PARAM_PRODUCT_CODE)) {
                 query.addCriteria(Criteria.where("priceDetails.offerDetailList.productCode")
-                        .is(params.get("productCode")));
+                        .is(params.get(PARAM_PRODUCT_CODE)));
             }
 
-            if (params.containsKey("offerType")) {
-                query.addCriteria(Criteria.where("offerType").is(params.get("offerType")));
+            if (params.containsKey(PARAM_OFFER_TYPE)) {
+                query.addCriteria(Criteria.where(PARAM_OFFER_TYPE).is(params.get(PARAM_OFFER_TYPE)));
             }
 
-            if (params.containsKey("published")) {
-                query.addCriteria(Criteria.where("published").is(params.get("published")));
+            if (params.containsKey(PARAM_PUBLISHED)) {
+                query.addCriteria(Criteria.where(PARAM_PUBLISHED).is(params.get(PARAM_PUBLISHED)));
             }
 
             long count = promotionMongoTemplate.count(query, EcsPromotion.class);
@@ -113,35 +115,35 @@ public class PromotionTools {
             return Map.of("count", count);
         } catch (Exception e) {
             log.error("Error counting promotions", e);
-            return Map.of("error", "Failed to count promotions: " + e.getMessage());
+            return Map.of(ERROR_MESSAGE, "Failed to count promotions: " + e.getMessage());
         }
     }
 
     private Map<String, Object> simplifyPromotion(EcsPromotion p) {
         List<Map<String, Object>> products = p.getPriceDetails() != null ?
                 p.getPriceDetails().stream()
-                        .filter(d -> "PRODUCTS".equals(d.getOfferDetailName()))
-                        .flatMap(d -> d.getOfferDetailList() != null ?
-                                d.getOfferDetailList().stream() : List.<EcsPromotion.ProductDetail>of().stream())
-                        .map(product -> Map.<String, Object>of(
-                                "productCode", product.getProductCode(),
-                                "productTypeCode", product.getProductTypeCode(),
-                                "productGroupNumber", product.getProductGroupNumber()
-                        ))
-                        .toList()
+                .filter(d -> "PRODUCTS".equals(d.getOfferDetailName()))
+                .flatMap(d -> d.getOfferDetailList() != null ?
+                        d.getOfferDetailList().stream() : List.<EcsPromotion.ProductDetail>of().stream())
+                .map(product -> Map.<String, Object>of(
+                        PARAM_PRODUCT_CODE, product.getProductCode(),
+                        "productTypeCode", product.getProductTypeCode(),
+                        "productGroupNumber", product.getProductGroupNumber()
+                ))
+                .toList()
                 : List.of();
 
         return Map.of(
                 "id", p.getId(),
-                "promotionName", p.getPromotionName() != null ? p.getPromotionName() : "",
-                "offerType", p.getOfferType() != null ? p.getOfferType() : 0,
-                "priceLevel", p.getPriceLevel() != null ? p.getPriceLevel() : 0,
-                "startDate", p.getPriceStartDate() != null && p.getPriceStartDate().getDate() != null ?
-                        p.getPriceStartDate().getDate().toString() : "",
-                "endDate", p.getPriceEndDate() != null && p.getPriceEndDate().getDate() != null ?
-                        p.getPriceEndDate().getDate().toString() : "",
+                PARAM_PROMOTION_NAME, p.getPromotionName() != null ? p.getPromotionName() : "",
+                PARAM_OFFER_TYPE, p.getOfferType() != null ? p.getOfferType() : 0,
+                PARAM_PRICE_LEVEL, p.getPriceLevel() != null ? p.getPriceLevel() : 0,
+                "startDate", p.getPriceStartDate() != null ?
+                        p.getPriceStartDate().toString() : "",
+                "endDate", p.getPriceEndDate() != null ?
+                        p.getPriceEndDate().toString() : "",
                 "canTrigger", p.getCanTrigger() != null && p.getCanTrigger(),
-                "published", p.getPublished() != null && p.getPublished(),
+                PARAM_PUBLISHED, p.getPublished() != null && p.getPublished(),
                 "products", products
         );
     }

@@ -3,18 +3,13 @@ package com.sainsburys.agent.tools;
 import java.util.List;
 import java.util.Map;
 
+import static com.sainsburys.agent.common.AppConstant.*;
+
 public class ToolDefinitions {
 
     private ToolDefinitions() {
         // Private constructor to prevent instantiation
     }
-
-    public static final String QUERY_PROMOTIONS = "query_promotions";
-    public static final String GET_PROMOTION_BY_ID = "get_promotion_by_id";
-    public static final String COUNT_PROMOTIONS = "count_promotions";
-    public static final String QUERY_PRICES = "query_prices";
-    public static final String GET_PRICE_BY_ID = "get_price_by_id";
-    public static final String GET_CURRENT_PRICE = "get_current_price";
 
     public static List<Map<String, Object>> getAllToolDefinitions() {
         return List.of(
@@ -23,7 +18,10 @@ public class ToolDefinitions {
                 createCountPromotionsTool(),
                 createQueryPricesTool(),
                 createGetPriceByIdTool(),
-                createGetCurrentPriceTool()
+                createGetCurrentPriceTool(),
+                createGetOfferTypeDetailTool(),
+                createQueryOfferTypesTool(),
+                createGetAllOfferTypesTool()
         );
     }
 
@@ -132,6 +130,55 @@ public class ToolDefinitions {
                                         "priceLevel", Map.of("type", "integer", "description", "Optional: filter by specific price level")
                                 ),
                                 "required", List.of("productCode")
+                        )
+                )
+        );
+    }
+
+    private static Map<String, Object> createGetOfferTypeDetailTool() {
+        return Map.of(
+                "type", "function",
+                "function", Map.of(
+                        "name", GET_OFFER_TYPE_DETAIL,
+                        "description", "Get detailed information about a specific offer type including its description, mechanics, and reward type. Use this to understand what an offer type code means.",
+                        "parameters", Map.of(
+                                "type", "object",
+                                "properties", Map.of(
+                                        "offerType", Map.of("type", "string", "description", "The offer type code (e.g., '411', '500')")
+                                ),
+                                "required", List.of("offerType")
+                        )
+                )
+        );
+    }
+
+    private static Map<String, Object> createQueryOfferTypesTool() {
+        return Map.of(
+                "type", "function",
+                "function", Map.of(
+                        "name", QUERY_OFFER_TYPES,
+                        "description", "Search and filter offer types by promotion type description or reward mechanic type",
+                        "parameters", Map.of(
+                                "type", "object",
+                                "properties", Map.of(
+                                        "promoTypeDesc", Map.of("type", "string", "description", "Search by promotion type description (case-insensitive partial match)"),
+                                        "rewardMechanicType", Map.of("type", "string", "description", "Filter by reward mechanic type"),
+                                        "limit", Map.of("type", "integer", "description", "Maximum number of results to return (1-100, default 50)")
+                                )
+                        )
+                )
+        );
+    }
+
+    private static Map<String, Object> createGetAllOfferTypesTool() {
+        return Map.of(
+                "type", "function",
+                "function", Map.of(
+                        "name", GET_ALL_OFFER_TYPES,
+                        "description", "Get a complete list of all available offer types with their descriptions and mechanics. Use this when you need to show or reference all offer types.",
+                        "parameters", Map.of(
+                                "type", "object",
+                                "properties", Map.of()
                         )
                 )
         );

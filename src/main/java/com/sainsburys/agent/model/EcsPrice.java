@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -25,10 +26,10 @@ public class EcsPrice {
     private String priceCode;
 
     @Field("priceStartDate")
-    private EcsPromotion.MongoDate priceStartDate;
+    private Date priceStartDate;
 
     @Field("priceEndDate")
-    private EcsPromotion.MongoDate priceEndDate;
+    private Date priceEndDate;
 
     private Integer offerType;
     private Boolean canTrigger;
@@ -40,10 +41,10 @@ public class EcsPrice {
     private Boolean published;
 
     @Field("createdDateTime")
-    private EcsPromotion.MongoDate createdDateTime;
+    private Date createdDateTime;
 
     @Field("lastUpdatedDateTime")
-    private EcsPromotion.MongoDate lastUpdatedDateTime;
+    private Date lastUpdatedDateTime;
 
     private Long version;
 

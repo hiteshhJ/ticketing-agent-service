@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.sainsburys.agent.common.AppConstant.*;
+
 @Slf4j
 @Component
 public class PriceTools {
@@ -34,26 +36,26 @@ public class PriceTools {
         try {
             Query query = new Query();
 
-            if (params.containsKey("productCode")) {
-                query.addCriteria(Criteria.where("productCode").is(params.get("productCode")));
+            if (params.containsKey(PARAM_PRODUCT_CODE)) {
+                query.addCriteria(Criteria.where(PARAM_PRODUCT_CODE).is(params.get(PARAM_PRODUCT_CODE)));
             }
 
-            if (params.containsKey("priceLevel")) {
-                query.addCriteria(Criteria.where("priceLevel").is(params.get("priceLevel")));
+            if (params.containsKey(PARAM_PRICE_LEVEL)) {
+                query.addCriteria(Criteria.where(PARAM_PRICE_LEVEL).is(params.get(PARAM_PRICE_LEVEL)));
             }
 
-            if (params.containsKey("priceCode")) {
-                query.addCriteria(Criteria.where("priceCode").is(params.get("priceCode")));
+            if (params.containsKey(PARAM_PRICE_CODE)) {
+                query.addCriteria(Criteria.where(PARAM_PRICE_CODE).is(params.get(PARAM_PRICE_CODE)));
             }
 
-            if (params.containsKey("offerType")) {
-                query.addCriteria(Criteria.where("offerType").is(params.get("offerType")));
+            if (params.containsKey(PARAM_OFFER_TYPE)) {
+                query.addCriteria(Criteria.where(PARAM_OFFER_TYPE).is(params.get(PARAM_OFFER_TYPE)));
             }
 
             int limit = params.containsKey("limit") ?
                     ((Number) params.get("limit")).intValue() : 10;
             query.limit(Math.min(limit, 100));
-            query.with(Sort.by(Sort.Direction.DESC, "priceStartDate.$date"));
+            query.with(Sort.by(Sort.Direction.DESC, PROP_PRICE_START_DATE));
 
             List<EcsPrice> results = priceHistoryMongoTemplate.find(query, EcsPrice.class);
 
@@ -66,7 +68,7 @@ public class PriceTools {
             );
         } catch (Exception e) {
             log.error("Error querying prices", e);
-            return Map.of("error", "Failed to query prices: " + e.getMessage());
+            return Map.of(ERROR_MESSAGE, "Failed to query prices: " + e.getMessage());
         }
     }
 
@@ -74,12 +76,12 @@ public class PriceTools {
         try {
             String id = (String) params.get("id");
             if (id == null) {
-                return Map.of("error", "ID is required");
+                return Map.of(ERROR_MESSAGE, "ID is required");
             }
 
             Optional<EcsPrice> price = priceRepository.findById(id);
             if (price.isEmpty()) {
-                return Map.of("error", "Price not found");
+                return Map.of(ERROR_MESSAGE, "Price not found");
             }
 
             return objectMapper.convertValue(price.get(), Map.class);
@@ -99,14 +101,14 @@ public class PriceTools {
             Instant now = Instant.now();
             Query query = new Query();
             query.addCriteria(Criteria.where("productCode").is(productCode));
-            query.addCriteria(Criteria.where("priceStartDate.$date").lte(now));
+            query.addCriteria(Criteria.where(PROP_PRICE_START_DATE).lte(now));
             query.addCriteria(Criteria.where("priceEndDate.$date").gte(now));
 
             if (params.containsKey("priceLevel")) {
                 query.addCriteria(Criteria.where("priceLevel").is(params.get("priceLevel")));
             }
 
-            query.with(Sort.by(Sort.Direction.DESC, "priceStartDate.$date"));
+            query.with(Sort.by(Sort.Direction.DESC, PROP_PRICE_START_DATE));
             query.limit(1);
 
             EcsPrice currentPrice = priceHistoryMongoTemplate.findOne(query, EcsPrice.class);
@@ -125,12 +127,10 @@ public class PriceTools {
                     "priceLevel", currentPrice.getPriceLevel() != null ? currentPrice.getPriceLevel() : 0,
                     "priceCode", currentPrice.getPriceCode() != null ? currentPrice.getPriceCode() : "",
                     "promotionName", currentPrice.getPromotionName() != null ? currentPrice.getPromotionName() : "",
-                    "validFrom", currentPrice.getPriceStartDate() != null &&
-                            currentPrice.getPriceStartDate().getDate() != null ?
-                            currentPrice.getPriceStartDate().getDate().toString() : "",
-                    "validUntil", currentPrice.getPriceEndDate() != null &&
-                            currentPrice.getPriceEndDate().getDate() != null ?
-                            currentPrice.getPriceEndDate().getDate().toString() : ""
+                    "validFrom", currentPrice.getPriceStartDate() != null ?
+                            currentPrice.getPriceStartDate().toString() : "",
+                    "validUntil", currentPrice.getPriceEndDate() != null ?
+                            currentPrice.getPriceEndDate().toString() : ""
             );
         } catch (Exception e) {
             log.error("Error getting current price", e);
@@ -148,10 +148,10 @@ public class PriceTools {
                 "priceCode", p.getPriceCode() != null ? p.getPriceCode() : "",
                 "price", price != null ? price : "",
                 "previousPrice", previousPrice != null ? previousPrice : "",
-                "startDate", p.getPriceStartDate() != null && p.getPriceStartDate().getDate() != null ?
-                        p.getPriceStartDate().getDate().toString() : "",
-                "endDate", p.getPriceEndDate() != null && p.getPriceEndDate().getDate() != null ?
-                        p.getPriceEndDate().getDate().toString() : "",
+                "startDate", p.getPriceStartDate() != null ?
+                        p.getPriceStartDate().toString() : "",
+                "endDate", p.getPriceEndDate() != null ?
+                        p.getPriceEndDate().toString() : "",
                 "offerType", p.getOfferType() != null ? p.getOfferType() : 0
         ));
 

@@ -45,7 +45,10 @@ public class MongoConfig {
         includeFilters = {
                 @org.springframework.context.annotation.ComponentScan.Filter(
                         type = org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE,
-                        classes = com.sainsburys.agent.repository.PromotionRepository.class
+                        classes = {
+                                com.sainsburys.agent.repository.PromotionRepository.class,
+                                com.sainsburys.agent.repository.OfferTypeRepository.class
+                        }
                 )
         }
 )

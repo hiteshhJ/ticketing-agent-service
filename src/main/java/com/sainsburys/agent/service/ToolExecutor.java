@@ -2,14 +2,16 @@ package com.sainsburys.agent.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sainsburys.agent.tools.OfferTypeTools;
 import com.sainsburys.agent.tools.PriceTools;
 import com.sainsburys.agent.tools.PromotionTools;
-import com.sainsburys.agent.tools.ToolDefinitions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+
+import static com.sainsburys.agent.common.AppConstant.*;
 
 @Slf4j
 @Service
@@ -18,6 +20,7 @@ public class ToolExecutor {
 
     private final PromotionTools promotionTools;
     private final PriceTools priceTools;
+    private final OfferTypeTools offerTypeTools;
     private final ObjectMapper objectMapper;
 
     public Map<String, Object> executeTool(String functionName, String argumentsJson) {
@@ -31,12 +34,15 @@ public class ToolExecutor {
             log.info("🔧 Executing tool: {} with params: {}", functionName, params);
 
             Map<String, Object> result = switch (functionName) {
-                case ToolDefinitions.QUERY_PROMOTIONS -> promotionTools.queryPromotions(params);
-                case ToolDefinitions.GET_PROMOTION_BY_ID -> promotionTools.getPromotionById(params);
-                case ToolDefinitions.COUNT_PROMOTIONS -> promotionTools.countPromotions(params);
-                case ToolDefinitions.QUERY_PRICES -> priceTools.queryPrices(params);
-                case ToolDefinitions.GET_PRICE_BY_ID -> priceTools.getPriceById(params);
-                case ToolDefinitions.GET_CURRENT_PRICE -> priceTools.getCurrentPrice(params);
+                case QUERY_PROMOTIONS -> promotionTools.queryPromotions(params);
+                case GET_PROMOTION_BY_ID -> promotionTools.getPromotionById(params);
+                case COUNT_PROMOTIONS -> promotionTools.countPromotions(params);
+                case QUERY_PRICES -> priceTools.queryPrices(params);
+                case GET_PRICE_BY_ID -> priceTools.getPriceById(params);
+                case GET_CURRENT_PRICE -> priceTools.getCurrentPrice(params);
+                case GET_OFFER_TYPE_DETAIL -> offerTypeTools.getOfferTypeDetail(params);
+                case QUERY_OFFER_TYPES -> offerTypeTools.queryOfferTypes(params);
+                case GET_ALL_OFFER_TYPES -> offerTypeTools.getAllOfferTypes();
                 default -> Map.of("error", "Unknown tool: " + functionName);
             };
 

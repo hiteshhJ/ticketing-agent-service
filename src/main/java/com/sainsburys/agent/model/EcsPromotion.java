@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -24,10 +24,10 @@ public class EcsPromotion {
     private List<String> priceCodes;
 
     @Field("priceStartDate")
-    private MongoDate priceStartDate;
+    private Date priceStartDate;
 
     @Field("priceEndDate")
-    private MongoDate priceEndDate;
+    private Date priceEndDate;
 
     private Integer offerType;
     private Boolean canTrigger;
@@ -39,10 +39,10 @@ public class EcsPromotion {
     private Boolean published;
 
     @Field("createdDateTime")
-    private MongoDate createdDateTime;
+    private Date createdDateTime;
 
     @Field("lastUpdatedDateTime")
-    private MongoDate lastUpdatedDateTime;
+    private Date lastUpdatedDateTime;
 
     private Integer version;
 
@@ -62,11 +62,5 @@ public class EcsPromotion {
         private String productTypeCode;
         private String productGroupNumber;
         private Boolean advertisingRequired;
-    }
-
-    @Data
-    public static class MongoDate {
-        @JsonProperty("$date")
-        private Instant date;
     }
 }
