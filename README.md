@@ -133,24 +133,6 @@ src/main/java/com/sainsburys/agent/
     └── MongoConfig.java               # MongoDB templates
 ```
 
-## Docker
-
-### Build Image
-```bash
-docker build -t ticketing-agent-service .
-```
-
-### Run Container
-```bash
-docker run -p 3001:3001 \
-  -e AZURE_OPENAI_ENDPOINT=... \
-  -e AZURE_OPENAI_API_KEY=... \
-  -e AZURE_OPENAI_DEPLOYMENT_NAME=... \
-  -e MONGODB_PROMOTION_URI=... \
-  -e MONGODB_PRICE_HISTORY_URI=... \
-  -e NEXTAUTH_SECRET=... \
-  ticketing-agent-service
-```
 
 ## Testing
 
@@ -171,27 +153,6 @@ curl -X POST http://localhost:8082/chat \
   -d '{
     "message": "What is the current price for SKU 1011289?"
   }'
-```
-
-## Deployment to Bosun
-
-Add to your `bosun.yaml`:
-
-```yaml
-services:
-  - name: ticketing-agent-service-java
-    image: ${IMAGE_REGISTRY}/ticketing-agent-service:${VERSION}
-    port: 3001
-    env:
-      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
-      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
-      - AZURE_OPENAI_DEPLOYMENT_NAME=${AZURE_OPENAI_DEPLOYMENT_NAME}
-      - MONGODB_PROMOTION_URI=${MONGODB_PROMOTION_URI}
-      - MONGODB_PRICE_HISTORY_URI=${MONGODB_PRICE_HISTORY_URI}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-    healthcheck:
-      path: /health
-      interval: 30s
 ```
 
 ## Troubleshooting
