@@ -100,11 +100,16 @@ public class ToolDefinitions {
                         TOOL_DEF_PARAMETERS, Map.of(
                                 TOOL_DEF_TYPE, TOOL_DEF_OBJECT,
                                 TOOL_DEF_PROPERTIES, Map.of(
-                                        "productCode", Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "Filter by product code (SKU)"),
-                                        "priceLevel", Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_INTEGER, TOOL_DEF_DESCRIPTION, "Filter by price level"),
-                                        "priceCode", Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "Filter by price code"),
-                                        "offerType", Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_INTEGER, TOOL_DEF_DESCRIPTION, "Filter by offer type"),
-                                        "limit", Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_INTEGER, TOOL_DEF_DESCRIPTION, "Maximum number of results to return (1-100, default 10)")
+                                        PARAM_PRICE_LEVEL, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_INTEGER, TOOL_DEF_DESCRIPTION, "Filter by price level (store or zone)"),
+                                        PARAM_PRICE_CODE, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "Filter by price code (Store ID or Zone ID)"),
+                                        PARAM_PRICE_START_DATE, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "Filter by price start date (ISO format, e.g., '2024-01-01T00:00:00Z')"),
+                                        PARAM_PRICE_END_DATE, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "Filter by price end date (ISO format, e.g., '2024-01-31T23:59:59Z')"),
+                                        PARAM_OFFER_TYPE, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_INTEGER, TOOL_DEF_DESCRIPTION, "Filter by offer type"),
+                                        PARAM_PRODUCT_CODE, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "Filter by product code"),
+                                        PARAM_PROMOTION_CODE, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "Search by promotion code (case-insensitive partial match) (e.g., 'R', 'C' etc)"),
+                                        PARAM_PROMOTION_NAME, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "Search by promotion name (case-insensitive partial match)"),
+                                        PARAM_IS_PUBLISHED, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_BOOLEAN, TOOL_DEF_DESCRIPTION, "Filter by published status (if published is true that means promotion is published to ECS)"),
+                                        PARAM_LIMIT, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_INTEGER, TOOL_DEF_DESCRIPTION, "Maximum number of results to return (1-100, default 10)")
                                 )
                         )
                 )
@@ -120,9 +125,9 @@ public class ToolDefinitions {
                         TOOL_DEF_PARAMETERS, Map.of(
                                 TOOL_DEF_TYPE, TOOL_DEF_OBJECT,
                                 TOOL_DEF_PROPERTIES, Map.of(
-                                        "id", Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "The price record ID (_id field)")
+                                        PARAM_ID, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "The price record ID (_id field)")
                                 ),
-                                "required", List.of("id")
+                                TOOL_DEF_REQUIRED, List.of(PARAM_ID)
                         )
                 )
         );
@@ -137,10 +142,10 @@ public class ToolDefinitions {
                         TOOL_DEF_PARAMETERS, Map.of(
                                 TOOL_DEF_TYPE, TOOL_DEF_OBJECT,
                                 TOOL_DEF_PROPERTIES, Map.of(
-                                        "productCode", Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "The product code (SKU)"),
-                                        "priceLevel", Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_INTEGER, TOOL_DEF_DESCRIPTION, "Optional: filter by specific price level")
+                                        PARAM_PRODUCT_CODE, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_STRING, TOOL_DEF_DESCRIPTION, "The product code (SKU)"),
+                                        PARAM_PRICE_LEVEL, Map.of(TOOL_DEF_TYPE, TOOL_DEF_TYPE_INTEGER, TOOL_DEF_DESCRIPTION, "Optional: filter by specific price level")
                                 ),
-                                "required", List.of("productCode")
+                                TOOL_DEF_REQUIRED, List.of(PARAM_PRODUCT_CODE)
                         )
                 )
         );

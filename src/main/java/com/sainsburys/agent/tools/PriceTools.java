@@ -42,7 +42,7 @@ public class PriceTools {
                     ((Number) params.get(PARAM_LIMIT)).intValue() : DEFAULT_LIMIT;
             query.limit(Math.min(limit, MAXIMUM_LIMIT));
 
-            query.with(Sort.by(Sort.Direction.DESC, PROP_PRICE_START_DATE));
+            query.with(Sort.by(Sort.Direction.DESC, PARAM_PRICE_START_DATE));
 
             List<EcsPrice> results = priceHistoryMongoTemplate.find(query, EcsPrice.class);
 
@@ -61,7 +61,7 @@ public class PriceTools {
 
     public Map<String, Object> getPriceById(Map<String, Object> params) {
         try {
-            String id = (String) params.get("id");
+            String id = (String) params.get(PARAM_ID);
             if (id == null) {
                 return Map.of(ERROR_MESSAGE, "ID is required");
             }
@@ -74,34 +74,34 @@ public class PriceTools {
             return objectMapper.convertValue(price.get(), Map.class);
         } catch (Exception e) {
             log.error("Error getting price by ID", e);
-            return Map.of("error", "Failed to get price: " + e.getMessage());
+            return Map.of(ERROR_MESSAGE, "Failed to get price: " + e.getMessage());
         }
     }
 
     public Map<String, Object> getCurrentPrice(Map<String, Object> params) {
         try {
-            String productCode = (String) params.get("productCode");
+            String productCode = (String) params.get(PARAM_PRODUCT_CODE);
             if (productCode == null) {
-                return Map.of("error", "Product code is required");
+                return Map.of(ERROR_MESSAGE, "Product code is required");
             }
 
             Instant now = Instant.now();
             Query query = new Query();
-            query.addCriteria(Criteria.where("productCode").is(productCode));
-            query.addCriteria(Criteria.where(PROP_PRICE_START_DATE).lte(now));
-            query.addCriteria(Criteria.where("priceEndDate.$date").gte(now));
+            query.addCriteria(Criteria.where(PARAM_PRODUCT_CODE).is(productCode));
+            query.addCriteria(Criteria.where(PARAM_PRICE_START_DATE).lte(now));
+            query.addCriteria(Criteria.where(PARAM_PRICE_END_DATE).gte(now));
 
-            if (params.containsKey("priceLevel")) {
-                query.addCriteria(Criteria.where("priceLevel").is(params.get("priceLevel")));
+            if (params.containsKey(PARAM_PRICE_LEVEL)) {
+                query.addCriteria(Criteria.where(PARAM_PRICE_LEVEL).is(params.get(PARAM_PRICE_LEVEL)));
             }
 
-            query.with(Sort.by(Sort.Direction.DESC, PROP_PRICE_START_DATE));
+            query.with(Sort.by(Sort.Direction.DESC, PARAM_PRICE_START_DATE));
             query.limit(1);
 
-            EcsPrice currentPrice = priceHistoryMongoTemplate.findOne(query, EcsPrice.class);
+            EcsPrice currentPrice = priceHistoryMongoTemplate.find(query, EcsPrice.class).getFirst();
 
             if (currentPrice == null) {
-                return Map.of("error", "No current price found for this product");
+                return Map.of(ERROR_MESSAGE, "No current price found for this product");
             }
 
             String price = extractPriceDetail(currentPrice, "PRICE");

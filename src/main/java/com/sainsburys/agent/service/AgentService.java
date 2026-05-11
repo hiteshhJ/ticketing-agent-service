@@ -52,6 +52,7 @@ public class AgentService {
             - When explaining promotions, include offer type descriptions from the offerTypeDetail collection for clarity
             - When the user asks about promotion types (e.g., show me active meal deal promtoions), here "meal deal" can be promo type description or promo mechanic description or reward mechnic type.
              These details are found in offer type table. Find the offer type first then search for promotions with that offer type
+            - When user specifically asks for promotions or complex promotions then only query from ecsPromotions otherwise always query from ecsPrices. Offer type is used by ecs promotions
             
             ## Current date: %s
             
@@ -104,8 +105,7 @@ public class AgentService {
             }
 
             // Safety check
-            if (choice.getFinishReason() == CompletionsFinishReason.STOPPED ||
-                    choice.getFinishReason() == CompletionsFinishReason.TOKEN_LIMIT_REACHED) {
+            if (canTerminateIterations(choice)) {
                 continueLoop = false;
             }
         }
@@ -118,6 +118,11 @@ public class AgentService {
                 .response(finalResponse)
                 .conversationHistory(updatedHistory)
                 .build();
+    }
+
+    private static boolean canTerminateIterations(ChatChoice choice) {
+        return choice.getFinishReason() == CompletionsFinishReason.STOPPED ||
+                choice.getFinishReason() == CompletionsFinishReason.TOKEN_LIMIT_REACHED;
     }
 
     private static List<ChatRequestMessage> buildMessages(String userMessage, List<Message> history) {

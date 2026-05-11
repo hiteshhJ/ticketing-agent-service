@@ -4,4 +4,8 @@ WORKDIR /app
 
 COPY target/*.jar app.jar
 
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=80", "-XX:InitialRAMPercentage=75", "-XX:+ExitOnOutOfMemoryError", "-jar", "app.jar"]
+
+COPY ./init.sh /init.sh
+RUN chmod +x /init.sh
+
+ENTRYPOINT [ "/init.sh" ]

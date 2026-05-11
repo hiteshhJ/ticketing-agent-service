@@ -8,5 +8,16 @@ resources:
 annotations:
   "downscaler/uptime": "Mon-Fri 08:00-19:00 Europe/London"
 envVariables:
-  applicationName: "ticketer-promotion-adapter"
+  applicationName: "ticketing-agent-service"
   SPRING_PROFILE_ACTIVE: "stg"
+  # Azure OpenAI Configuration
+  AZURE_OPENAI_ENDPOINT: "vault:secret/data/ticketing/agent-service/azure-openai/#endpoint"
+  AZURE_OPENAI_API_KEY: "vault:secret/data/ticketing/agent-service/azure-openai/#api-key"
+  AZURE_OPENAI_DEPLOYMENT_NAME: "vault:secret/data/ticketing/agent-service/azure-openai/#deployment-name"
+  # MongoDB Configuration
+  MONGODB_PROMOTION_URI: "vault:secret/data/ticketing/agent-service/mongodb/#promotion-uri"
+  MONGODB_PRICE_HISTORY_URI: "vault:secret/data/ticketing/agent-service/mongodb/#price-history-uri"
+  # Azure AD Authentication
+  azureTenantId: "vault:secret/data/ticketing/ticketing-app#AUTH_MICROSOFT_ENTRA_ID_TENANT_ID"
+  azureClientId: "vault:secret/data/ticketing/ticketing-app#AUTH_MICROSOFT_ENTRA_ID_CLIENT_ID"
+  azureClientSecret: "vault:secret/data/ticketing/ticketing-app#AUTH_MICROSOFT_ENTRA_ID_CLIENT_SECRET"
